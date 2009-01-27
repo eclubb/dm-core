@@ -89,7 +89,9 @@ module DataMapper
           bind_values = query_values unless query_values.empty?
           query = child_key.zip(bind_values.transpose).to_hash
 
-          collection = child_model.send(finder, *(args.dup << @query.merge(options).merge(query)))
+          collection = repository(parent.repository.name) do
+            child_model.send(finder, *(args.dup << @query.merge(options).merge(query)))
+          end
 
           return collection unless collection.kind_of?(Collection) && collection.any?
 
@@ -125,7 +127,9 @@ module DataMapper
             end
           end
 
-          ret || child_model.send(finder, *(args.dup << @query.merge(options).merge(child_key.zip([ parent_value ]).to_hash)))
+          ret || repository(parent.repository.name) do
+            child_model.send(finder, *(args.dup << @query.merge(options).merge(child_key.zip([ parent_value ]).to_hash)))
+          end
         end
       end
 
@@ -152,7 +156,10 @@ module DataMapper
           query = parent_key.zip(bind_values.transpose).to_hash
           association_accessor = "#{self.name}_association"
 
-          collection = parent_model.send(:all, query)
+          collection = repository(child.repository.name) do
+            parent_model.send(:all, query)
+          end
+
           unless collection.empty?
             collection.send(:lazy_load)
             children.each do |c|
