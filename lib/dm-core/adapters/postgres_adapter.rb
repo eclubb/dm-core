@@ -1,4 +1,4 @@
-gem 'do_postgres', '~>0.9.11'
+gem 'do_postgres', '~>0.9.12'
 require 'do_postgres'
 
 module DataMapper
@@ -18,28 +18,28 @@ module DataMapper
       module Migration
         # TODO: move to dm-more/dm-migrations (if possible)
         def storage_exists?(storage_name)
-          statement = <<-EOS.compress_lines
+          statement = <<-SQL.compress_lines
             SELECT COUNT(*)
-            FROM "information_schema"."columns"
-            WHERE "table_name" = ?
+            FROM "information_schema"."tables"
+            WHERE "table_type" = 'BASE TABLE'
             AND "table_schema" = current_schema()
-          EOS
+            AND "table_name" = ?
+          SQL
 
           query(statement, storage_name).first > 0
         end
 
         # TODO: move to dm-more/dm-migrations (if possible)
         def field_exists?(storage_name, column_name)
-          statement = <<-EOS.compress_lines
+          statement = <<-SQL.compress_lines
             SELECT COUNT(*)
-            FROM "pg_class"
-            JOIN "pg_attribute" ON "pg_class"."oid" = "pg_attribute"."attrelid"
-            WHERE "pg_attribute"."attname" = ?
-            AND "pg_class"."relname" = ?
-            AND "pg_attribute"."attnum" >= 0
-          EOS
+            FROM "information_schema"."columns"
+            WHERE "table_schema" = current_schema()
+            AND "table_name" = ?
+            AND "column_name" = ?
+          SQL
 
-          query(statement, column_name, storage_name).first > 0
+          query(statement, storage_name, column_name).first > 0
         end
 
         # TODO: move to dm-more/dm-migrations
@@ -112,8 +112,9 @@ module DataMapper
           def sequence_exists?(repository, property)
             statement = <<-EOS.compress_lines
               SELECT COUNT(*)
-              FROM "pg_class"
-              WHERE "relkind" = 'S' AND "relname" = ?
+              FROM "information_schema"."sequences"
+              WHERE "sequence_name" = ?
+              AND "sequence_schema" = current_schema()
             EOS
 
             query(statement, sequence_name(repository, property)).first > 0

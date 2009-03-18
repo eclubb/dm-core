@@ -19,7 +19,7 @@ require 'yaml'
 gem 'addressable', '~>2.0.1'
 require 'addressable/uri'
 
-gem 'extlib', '~>0.9.10'
+gem 'extlib', '~>0.9.11'
 require 'extlib'
 require 'extlib/inflection'
 
@@ -171,7 +171,7 @@ module DataMapper
   # @demo spec/integration/repository_spec.rb
   def self.repository(name = nil) # :yields: current_context
     current_repository = if name
-      raise ArgumentError, "First optional argument must be a Symbol, but was #{args.first.inspect}" unless name.is_a?(Symbol)
+      raise ArgumentError, "First optional argument must be a Symbol, but was #{name.inspect}" unless name.is_a?(Symbol)
       Repository.context.detect { |r| r.name == name } || Repository.new(name)
     else
       Repository.context.last || Repository.new(Repository.default_name)
