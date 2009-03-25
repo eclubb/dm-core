@@ -16,7 +16,7 @@ require 'set'
 require 'time'
 require 'yaml'
 
-gem 'addressable', '~>2.0.2'
+gem 'addressable', '~>2.0.1'
 require 'addressable/uri'
 
 gem 'extlib', '~>0.9.11'
@@ -24,7 +24,7 @@ require 'extlib'
 require 'extlib/inflection'
 
 begin
-  gem 'fastthread', '~>1.0.4'
+  gem 'fastthread', '~>1.0.1'
   require 'fastthread'
 rescue LoadError
   # fastthread not installed
