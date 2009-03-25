@@ -77,4 +77,4 @@ module DataMapper
       end
     end
   end # class TypeMap
-end # module DataMapper
+end # module DataMapper
