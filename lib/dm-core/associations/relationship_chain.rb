@@ -23,7 +23,10 @@ module DataMapper
         query[:unique] = true
 
         with_repository(parent) do
-          results = grandchild_model.send(finder, *(args << query))
+          results = repository(parent.repository.name) do
+            grandchild_model.send(finder, *(args << query))
+          end
+
           # FIXME: remove the need for the uniq.freeze
           finder == :all ? (@mutable ? results : results.freeze) : results
         end
